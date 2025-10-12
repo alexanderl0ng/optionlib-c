@@ -57,12 +57,12 @@ double binomial_tree_put_with_dividend(double S, double K, double T, double r, d
 
 ## Parameters
 
-`S`: Current stock/asset price
-`K`: Strike price
-`T`: Time to expiration (years)
-`r`: Risk-free interest rate (annual)
-`sigma`: Volatility (annual standard deviation)
-`dividend`: Continuous dividend yield (annual)
-`steps`: Number of time steps in binomial tree
+`S`: Current stock/asset price   
+`K`: Strike price   
+`T`: Time to expiration (years)   
+`r`: Risk-free interest rate (annual)    
+`sigma`: Volatility (annual standard deviation)    
+`dividend`: Continuous dividend yield (annual)    
+`steps`: Number of time steps in binomial tree    
 
 
