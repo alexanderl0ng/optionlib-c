@@ -1,0 +1,9 @@
+build/
+wasm/
+
+.DS_Store
+
+*.0
+*.a
+*.out
+

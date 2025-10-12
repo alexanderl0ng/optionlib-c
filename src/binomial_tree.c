@@ -1,0 +1,59 @@
+#include "optionlib.h"
+#include <math.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
+static double binomial_tree_calculation(double S, double K, double T, double r, double sigma, bool is_call, int steps, double dividend);
+static inline double max_double(double x, double y);
+
+double binomial_tree_call(double S, double K, double T, double r, double sigma, int steps) {
+    return binomial_tree_calculation(S, K, T, r, sigma, true, steps, 0.0);
+}
+
+double binomial_tree_put(double S, double K, double T, double r, double sigma, int steps) {
+    return binomial_tree_calculation(S, K, T, r, sigma, false, steps, 0.0);
+}
+
+double binomial_tree_call_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend) {
+    return binomial_tree_calculation(S, K, T, r, sigma, true, steps, dividend);
+}
+
+double binomial_tree_put_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend) {
+    return binomial_tree_calculation(S, K, T, r, sigma, false, steps, dividend);
+}
+
+static double binomial_tree_calculation(double S, double K, double T, double r, double sigma, bool is_call, int steps, double dividend) {
+    double dt = T / steps;
+    double u = exp(sigma * sqrt(dt));
+    double d = 1 / u;
+    double p = (exp((r - dividend) * dt) - d) / (u - d);
+    double discount = exp(-r * dt);
+
+    double *option_values = malloc((steps + 1) * sizeof(double));
+
+    if (is_call) {
+        for (int i = 0; i < steps + 1; i++) {
+            option_values[i] = max_double((S * pow(u,(steps - i)) * pow(d, i)) - K, 0.0);
+        }
+    } else {
+        for (int i = 0; i < steps + 1; i++) {
+            option_values[i] = max_double(K - (S * pow(u,(steps - i)) * pow(d, i)), 0.0);
+        }
+    }
+
+    for (int i = steps - 1; i >= 0; i--) {
+        for (int j = 0; j <= i; j++) {
+            option_values[j] = (p * option_values[j] + (1 - p) * option_values[j + 1]) * discount;
+        }
+    }
+
+    double result = option_values[0];
+    free(option_values);
+
+    return result;
+}
+
+static inline double max_double(double x, double y) {
+    return x > y ? x : y;
+}
+
