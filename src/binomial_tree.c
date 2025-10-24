@@ -3,26 +3,42 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-static double binomial_tree_calculation(double S, double K, double T, double r, double sigma, bool is_call, int steps, double dividend);
+static double binomial_tree_calculation(double S, double K, double T, double r, double sigma, bool is_call, int steps, double dividend, bool is_american);
 static inline double max_double(double x, double y);
 
-double binomial_tree_call(double S, double K, double T, double r, double sigma, int steps) {
-    return binomial_tree_calculation(S, K, T, r, sigma, true, steps, 0.0);
+double binomial_tree_call_european(double S, double K, double T, double r, double sigma, int steps) {
+    return binomial_tree_calculation(S, K, T, r, sigma, true, steps, 0.0, false);
 }
 
-double binomial_tree_put(double S, double K, double T, double r, double sigma, int steps) {
-    return binomial_tree_calculation(S, K, T, r, sigma, false, steps, 0.0);
+double binomial_tree_put_european(double S, double K, double T, double r, double sigma, int steps) {
+    return binomial_tree_calculation(S, K, T, r, sigma, false, steps, 0.0, false);
 }
 
-double binomial_tree_call_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend) {
-    return binomial_tree_calculation(S, K, T, r, sigma, true, steps, dividend);
+double binomial_tree_call_european_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend) {
+    return binomial_tree_calculation(S, K, T, r, sigma, true, steps, dividend, false);
 }
 
-double binomial_tree_put_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend) {
-    return binomial_tree_calculation(S, K, T, r, sigma, false, steps, dividend);
+double binomial_tree_put_european_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend) {
+    return binomial_tree_calculation(S, K, T, r, sigma, false, steps, dividend, false);
 }
 
-static double binomial_tree_calculation(double S, double K, double T, double r, double sigma, bool is_call, int steps, double dividend) {
+double binomial_tree_call_american(double S, double K, double T, double r, double sigma, int steps) {
+    return binomial_tree_calculation(S, K, T, r, sigma, true, steps, 0.0, true);
+}
+
+double binomial_tree_put_american(double S, double K, double T, double r, double sigma, int steps) {
+    return binomial_tree_calculation(S, K, T, r, sigma, false, steps, 0.0, true);
+}
+
+double binomial_tree_call_american_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend) {
+    return binomial_tree_calculation(S, K, T, r, sigma, true, steps, dividend, true);
+}
+
+double binomial_tree_put_american_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend) {
+    return binomial_tree_calculation(S, K, T, r, sigma, false, steps, dividend, true);
+}
+
+static double binomial_tree_calculation(double S, double K, double T, double r, double sigma, bool is_call, int steps, double dividend, bool is_american) {
     double dt = T / steps;
     double u = exp(sigma * sqrt(dt));
     double d = 1 / u;
@@ -44,6 +60,13 @@ static double binomial_tree_calculation(double S, double K, double T, double r, 
     for (int i = steps - 1; i >= 0; i--) {
         for (int j = 0; j <= i; j++) {
             option_values[j] = (p * option_values[j] + (1 - p) * option_values[j + 1]) * discount;
+            if (is_american) {
+                double stock_price = (S * pow(u, i - j) * pow(d, j));
+                double intrinsic_value = is_call ?
+                    max_double(stock_price - K, 0.0) :
+                    max_double(K - stock_price, 0.0);
+                option_values[j] = max_double(option_values[j], intrinsic_value);
+            }
         }
     }
 

@@ -42,10 +42,15 @@ double black_scholes_put_with_dividend(double S, double K, double T, double r, d
  *
  */
 
-double binomial_tree_call(double S, double K, double T, double r, double sigma, int steps);
-double binomial_tree_put(double S, double K, double T, double r, double sigma, int steps);
-double binomial_tree_call_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend);
-double binomial_tree_put_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend);
+double binomial_tree_call_european(double S, double K, double T, double r, double sigma, int steps);
+double binomial_tree_put_european(double S, double K, double T, double r, double sigma, int steps);
+double binomial_tree_call_european_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend);
+double binomial_tree_put_european_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend);
+
+double binomial_tree_call_american(double S, double K, double T, double r, double sigma, int steps);
+double binomial_tree_put_american(double S, double K, double T, double r, double sigma, int steps);
+double binomial_tree_call_american_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend);
+double binomial_tree_put_american_with_dividend(double S, double K, double T, double r, double sigma, int steps, double dividend);
 
 #ifdef __cplusplus
 }

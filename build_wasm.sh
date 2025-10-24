@@ -42,10 +42,14 @@ EXPORTED_FUNCTIONS='[
     "_black_scholes_put",
     "_black_scholes_call_with_dividend",
     "_black_scholes_put_with_dividend",
-    "_binomial_tree_call",
-    "_binomial_tree_put",
-    "_binomial_tree_call_with_dividend",
-    "_binomial_tree_put_with_dividend"
+    "_binomial_tree_call_european",
+    "_binomial_tree_put_european",
+    "_binomial_tree_call_european_with_dividend",
+    "_binomial_tree_put_european_with_dividend",
+    "_binomial_tree_call_american",
+    "_binomial_tree_put_american",
+    "_binomial_tree_call_american_with_dividend",
+    "_binomial_tree_put_american_with_dividend"
 ]'
 
 emcc $FLAGS \
