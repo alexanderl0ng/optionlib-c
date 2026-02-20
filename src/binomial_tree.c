@@ -45,32 +45,55 @@ static double binomial_tree_calculation(double S, double K, double T, double r, 
     double p = (exp((r - dividend) * dt) - d) / (u - d);
     double discount = exp(-r * dt);
 
+    double p_disc = p * discount;
+    double q_disc = (1.0 - p) * discount;
+
+    double *u_pow = malloc((steps + 1) * sizeof(double));
+    double *d_pow = malloc((steps + 1) * sizeof(double));
+
+    u_pow[0] = 1;
+    d_pow[0] = 1;
+
+    for (int i = 1; i <= steps; i++) {
+        u_pow[i] = u_pow[i - 1] * u;
+	d_pow[i] = d_pow[i - 1] * d;
+    }
+
     double *option_values = malloc((steps + 1) * sizeof(double));
 
     if (is_call) {
         for (int i = 0; i < steps + 1; i++) {
-            option_values[i] = max_double((S * pow(u,(steps - i)) * pow(d, i)) - K, 0.0);
+            option_values[i] = max_double((S * u_pow[steps - i] * d_pow[i]) - K, 0.0);
         }
     } else {
         for (int i = 0; i < steps + 1; i++) {
-            option_values[i] = max_double(K - (S * pow(u,(steps - i)) * pow(d, i)), 0.0);
+            option_values[i] = max_double(K - (S * u_pow[steps - i] * d_pow[i]), 0.0);
         }
     }
 
-    for (int i = steps - 1; i >= 0; i--) {
-        for (int j = 0; j <= i; j++) {
-            option_values[j] = (p * option_values[j] + (1 - p) * option_values[j + 1]) * discount;
-            if (is_american) {
-                double stock_price = (S * pow(u, i - j) * pow(d, j));
-                double intrinsic_value = is_call ?
-                    max_double(stock_price - K, 0.0) :
-                    max_double(K - stock_price, 0.0);
-                option_values[j] = max_double(option_values[j], intrinsic_value);
-            }
-        }
+
+    if (is_american) {
+        for (int i = steps - 1; i >= 0; i--) {
+	        for (int j = 0; j <= i; j++) {
+		        option_values[j] = p_disc * option_values[j] + q_disc * option_values[j + 1];
+		        double stock_price = (S * u_pow[i - j] * d_pow[j]);
+        		double intrinsic_value = is_call ?
+        		    max_double(stock_price - K, 0.0) :
+        		    max_double(K - stock_price, 0.0);
+        		option_values[j] = max_double(option_values[j], intrinsic_value);
+	    }
+	}
+    } else {
+    	for (int i = steps - 1; i >= 0; i--) {
+    	    for (int j = 0; j <= i; j++) {
+    		    option_values[j] = p_disc * option_values[j] + q_disc * option_values[j + 1];
+    	    }
+    	}
     }
 
     double result = option_values[0];
+    free(u_pow);
+    free(d_pow);
     free(option_values);
 
     return result;
@@ -79,4 +102,3 @@ static double binomial_tree_calculation(double S, double K, double T, double r, 
 static inline double max_double(double x, double y) {
     return x > y ? x : y;
 }
-

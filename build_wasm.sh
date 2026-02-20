@@ -32,7 +32,7 @@ done
 if [ "$BUILD_MODE" = "debug" ]; then
     FLAGS="-g -O0"
 else
-    FLAGS="-O3"
+    FLAGS="-O3 -ffast-math"
 fi
 
 mkdir -p $OUTPUT_DIR
