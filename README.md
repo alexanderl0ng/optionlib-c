@@ -18,8 +18,12 @@ A high-performance options pricing library written in C, compiled to WebAssembly
 ### Native Build
 
 ```bash
-./build.sh test    # Build and run tests
-./build.sh lib     # Build static library
+make test-debug			# Build tests (debug)
+make test-release		# Build tests (release)
+make run-test-debug 	# Build and run tests (debug)
+make run-test-release 	# Build and run tests (release)
+make debug 				# Build static library (debug)
+make release 			# Build static library (release)
 ```
 
 ### WebAssembly Build
@@ -27,8 +31,7 @@ A high-performance options pricing library written in C, compiled to WebAssembly
 Requires [Emscripten](https://emscripten.org/).
 
 ```bash
-./build_wasm.sh          # Release build
-./build_wasm.sh debug    # Debug build
+make wasm 			# Release build
 ```
 
 ---
